@@ -2,7 +2,7 @@ import csv
 import numpy as np
 import pickle
 import Configuration as CF
-import Vector_creator as VC
+import Feature_Extraction
 import Feature
 import time
 
@@ -21,20 +21,20 @@ def pre_data():
 	for row in reader:
 		if i > 0:
 			st = time.time()
-			print (row)
-			feature = VC.Construct_Vector(row[0])
+			# print (row)
+			feature = Feature_Extraction.generated(row[0])
 			feature.extend(Feature.generate(row[0]))
 			feature.append(int (row[1]))
 			# print (feature)
 			writer.writerow(feature)
-			print (time.time() - st)
+			# print (time.time() - st)
 			# break
 		i += 1
-		# if i%10==0:
-		# 	print ("i = ", i)
-# pre_data()
+		if i%10==0:
+			print ("i = ", i)
+pre_data()
 
 def extract_feature(url):
-	feature = VC.Construct_Vector(url)
+	feature = Feature_Extraction.generated(url)
 	feature.extend(Feature.generate(url))
 	return feature
