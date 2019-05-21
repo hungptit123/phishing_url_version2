@@ -18,10 +18,16 @@ def numDash(total_special):
 	return total_special['-']
 
 def atSymbol(total_special):
-	return total_special['@']
+	if (total_special['@'] > 0):
+		return 1
+	return 0
+	# return total_special['@']
 
 def tildeSymbol(total_special):
-	return total_special['~']
+	if total_special['~'] > 0:
+		return 1
+	return 0
+	# return total_special['~']
 
 def numUnderscore(total_special):
 	return total_special['_']
@@ -43,13 +49,21 @@ def numNumericChars(url_remove_protocol):
 			count += 1
 	return count
 
+def get_TLD():
+	f = open("Dataset/list_tld.txt", "r")
+	data = []
+	for x in f:
+		data.append(x[:len(x)-1])
+	return data
+		# break
+TLDs = get_TLD()
+
 def domainToken(hostname):
 	domain_tokens=hostname.split('.')
 	domain_tokens=[x for x in domain_tokens if x!='']
 	return domain_tokens
 
 def subdomainLevel(domain_tokens):
-	TLDs = ['com', 'vn']
 	count = 0
 	for i in range(len(domain_tokens)):
 		if domain_tokens[len(domain_tokens)-1-i] in TLDs:
@@ -75,9 +89,11 @@ def numDashInHostname(hostname):
 
 def noHttps(url):
 	a = url[:5]
+	a = a.lower()
 	if a == "https":
 		return 1
 	return 0
+	
 def ip_address(domain_tokens):
 	for i in domain_tokens:
 		if i.isdigit()==False:
@@ -86,7 +102,6 @@ def ip_address(domain_tokens):
 		return 1
 
 def get_domain_and_subdomain(domain_tokens):
-	TLDs = ['com', 'vn', 'gov', 'org', 'edu', 'info', 'jobs', 'sg']
 	count = 0
 	for i in range(len(domain_tokens)):
 		if domain_tokens[len(domain_tokens)-1-i] in TLDs:
@@ -135,6 +150,7 @@ def pathLength(paths):
 	for x in paths:
 		count += len(x)
 	return count
+
 def doubleSlashInPath(paths):
 	for x in paths:
 		if x == "/":
@@ -148,8 +164,8 @@ def numSensitiveWords(url_remove_protocol):
 	for x in Suspicious_Words:
 		count += len(url_remove_protocol.split(x))-1
 	return count
+
 def frequentDomainNameMismatch(domain_tokens):
-	TLDs = ['com', 'vn', 'gov', 'org', 'edu', 'info', 'jobs']
 	TLD = domain_tokens[-1]
 	# print (TLD)
 	if TLD in TLDs:
@@ -163,6 +179,7 @@ def url_length_RT(url_remove_protocol):
         return 0
     else:
        return -1
+       
 def num_and_size_of_query(paths):
 	paths_tokens=[re.sub('/','',x) for x in paths]
 	count = 0
@@ -225,12 +242,9 @@ def generated(url):
 	features.append(numSensitiveWords(url_remove_protocol))
 	
 	features.append(frequentDomainNameMismatch(domain_tokens))
-
+	# Nhom Tuong Quan
 	features.append(url_length_RT(url_remove_protocol))
 	features.append(subdomainLevelRT(domain_tokens)) #Rotate subdomain
-
-	# print (len(features))
-	# print (features)
 	return features
 
 # generated(" ")

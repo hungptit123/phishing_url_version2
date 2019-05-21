@@ -4,10 +4,6 @@ import requests
 import bs4
 import urllib.request
 
-# Calculates number of months
-# def diff_month(d1, d2):
-#     return (d1.year - d2.year) * 12 + d1.month - d2.month
-
 def get_id_having_address(url):
     try:
         ipaddress.ip_address(url)
@@ -15,22 +11,6 @@ def get_id_having_address(url):
         return 1
     except:
         return -1
-
-# def get_global_rank(domain):
-#     # return -1
-#     try:
-#         rank_checker_response = requests.post("https://www.checkpagerank.net/index.php", {
-#             "name": domain
-#         })
-#     except:
-#         return -1
-
-#     # Extracts global rank of the website
-#     try:
-#         global_rank = int(re.findall(r"Global Rank: ([0-9]+)", rank_checker_response.text)[0])
-#     except:
-#         global_rank = -1
-#     return global_rank
 
 def SubmitInfoToEmail(response):
     # Submitting_to_email
@@ -80,10 +60,13 @@ def imagesOnlyInForm(soup):
 
 def Preprocess(url):
     urlRE = 'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'
+    # print (1)
     try:
-        html_page = urllib.request.urlopen(url).read()
+        html_page = requests.get(url).text
+        # print (1)
     except Exception as e:
         return 0, 0, 0, 0, 0, 0, 0
+    # print (1)
     soup = bs4.BeautifulSoup(html_page, features="html.parser")
     a = soup.findAll(href=re.compile(r'/.a\w+'))
     b = ''
@@ -117,15 +100,19 @@ def Preprocess(url):
                 TotalURL += 1
             else :
                 TotalNullLink += 1
+    # print (TotalHyperlink)
+    # print (TotalExternal)
+    # print (TotalURL)
+    # print (TotalNullLink)
+    # print (favicon)
+    # print (num_MetaScriptLink)
     return TotalHyperlink, TotalExternal, TotalURL, TotalNullLink, soup, favicon, num_MetaScriptLink
-# url = "https://www.facebook.com/"
-# url = "https://www.w3schools.com/html/html_scripts.asp"
-# TotalHyperlink, TotalExternal, TotalURL, TotalNullLink, soup, favicon, num_MetaScriptLink= Preprocess(url)
-
+    
 def PctExtHyperlinks(TotalExternal, TotalHyperlink):
     if TotalHyperlink != 0:
         return (TotalExternal / TotalHyperlink)
     return 0
+
 def PctExtResourceUrls(TotalURL, TotalHyperlink):
     if TotalHyperlink != 0:
         return (TotalURL / TotalHyperlink)
@@ -168,6 +155,7 @@ def extMetaScriptLinkRT(num_MetaScriptLink):
 
 def generate(url):
     # Converts the given URL into standard format
+    # url = "https://viblo.asia/p/tim-hieu-ve-url-va-cach-nhan-biet-link-url-an-toan-3P0lPOonZox"
     if not re.match(r"^https?", url):
         url= "http://" + url
     # print (url)
@@ -177,12 +165,10 @@ def generate(url):
         response = requests.get(url)
     except:
         response = ""
+    # print (response.text)
+    # print (requests.get(url))
     domain = re.findall(r"://([^/]+)/?", url)[0]
     features = []
-    # if response == "":
-    #     print (1)
-    features.append(get_id_having_address(url))
-    # features.append(get_global_rank(domain))
     if response == "":
         features.append(-1)
         features.append(-1)
@@ -197,6 +183,7 @@ def generate(url):
         features.append(IframeOrFrame(response))
     TotalHyperlink, TotalExternal, TotalURL, TotalNullLink, soup, favicon, num_MetaScriptLink= Preprocess(url)
     features.append(favicon)
+    # print (1)
     if TotalExternal == 0 and TotalURL == 0 and TotalHyperlink == 0:
         features.append(-1)
         features.append(-1)
@@ -213,7 +200,5 @@ def generate(url):
         features.append(pctExtNullSelfRedirectHyperlinksRT(TotalNullLink))
         features.append(PctExtResourceUrlsRT(TotalURL))
         features.append(extMetaScriptLinkRT(num_MetaScriptLink))
-
-    # print (len(features))
     return (features)
 # generate("https://www.facebook.com/")

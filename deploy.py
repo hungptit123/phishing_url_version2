@@ -5,6 +5,7 @@ app = Flask(__name__)
 @app.route('/',methods = ['POST', 'GET'])
 def interface():
 	if request.method == 'POST':
+		# result = "Hellow World"
 		value = request.form.items()
 		for key, url in value:
 			result = Randomforest.Accuracy_Randomforest(url)
