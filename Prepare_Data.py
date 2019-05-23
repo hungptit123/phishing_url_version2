@@ -2,44 +2,32 @@ import csv
 import numpy as np
 import pickle
 import Configuration as CF
-import Feature_Extraction
-import Feature
+import Feature_Characters
+import Feature_HTML
 import time
 
 def pre_data():
 	# return file csv extract feature from url
 	reader = csv.reader(open(CF.DIR_DATA_TRAIN, "r"))
-	writer = csv.writer(open(CF.DIR_DATA_TRANFORM, "w"))
+	writer = csv.writer(open(CF.DIR_DATA_TRANFORM, "a"))
 	# writer.writerow(properities())
 	i = 0
 	arr = []
 	st = time.time()
 	for row in reader:
-		if i > 0:
+		if i > 5500:
+			print (row)
 			st = time.time()
-			feature = Feature_Extraction.generated(row[0])
-			feature.extend(Feature.generate(row[0]))
+			feature = Feature_Characters.generated(row[0])
+			feature.extend(Feature_HTML.generate(row[0]))
 			feature.append(int (row[1]))
+			print (feature)
+			# if (time.time()-st <= 50):
 			writer.writerow(feature)
-			print (row, "  :  time = ", time.time()-st)
+			print ("time = ", time.time()-st)
 		i += 1
-pre_data()
-
-def extract_feature(url):
-	feature = Feature_Extraction.generated(url)
-	feature.extend(Feature.generate(url))
-	# print (feature)
-	return feature
-
-# def tinh():
-# 	reader = csv.reader(open(CF.DIR_DATA_TRANFORM, "r"))
-# 	data = {}
-# 	data['0'] = 0
-# 	data['1'] = 0
-# 	for row in reader:
-# 		if len(row) > 0:
-# 			data[row[-1]] += 1
-# 	print (data)
-# tinh()
-
-# extract_feature("http://www.van-sant.si/components/com_akeeba/controllers/drive/auth/vi")
+		if (i%50 == 0):
+			print (i)
+		if i==6500:
+			break
+# pre_data()
